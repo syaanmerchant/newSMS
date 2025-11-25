@@ -11,7 +11,7 @@ int load_medications(const char *filename, MedicationList *list);
 // Returns 1 on success, 0 on failure.
 int save_medications(const char *filename, MedicationList *list);
 
-// Export medications as CSV.
+// Export medications as CSV
 // Returns 1 on success, 0 on failure.
 int export_medications_csv(const char *filename, MedicationList *list);
 
