@@ -1,30 +1,14 @@
 CC = gcc
-
-# Compile flags:
-#  -Wall -Wextra : show useful warnings
-#  -Iinclude     : look for headers in include/
-#  pkg-config    : add GTK include flags
 CFLAGS = -Wall -Wextra -Iinclude `pkg-config --cflags gtk+-3.0`
-
-# Linker flags: use pkg-config to link against GTK libs
 LDFLAGS = `pkg-config --libs gtk+-3.0`
 
-SRC = src/main.c src/core.c src/io.c src/gui.c
+SRC = src/main.c src/core.c src/gui.c src/io.c
 OBJ = $(SRC:.c=.o)
-#TXT = data/meds_export.csv data/meds.txt wiki_tmp.txt
-
-# Allow C code to call python script
-PYTHON = python3
 
 all: medmate
 
 medmate: $(OBJ)
 	$(CC) -o medmate $(OBJ) $(LDFLAGS)
 
-# Generic compile rule
-src/%.o: src/%.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
 clean:
-	rm -f $(OBJ) medmate  
-
+	rm -f $(OBJ) medmate
