@@ -1,14 +1,13 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude `pkg-config --cflags gtk+-3.0`
-LDFLAGS = `pkg-config --libs gtk+-3.0`
+CFLAGS = -Wall -Wextra -Iinclude
 
-SRC = src/main.c src/core.c src/gui.c src/io.c
+SRC = src/main.c src/core.c src/io.c src/gui.c
 OBJ = $(SRC:.c=.o)
 
 all: medmate
 
 medmate: $(OBJ)
-	$(CC) -o medmate $(OBJ) $(LDFLAGS)
+	$(CC) -o medmate $(OBJ)
 
 clean:
 	rm -f $(OBJ) medmate
