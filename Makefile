@@ -17,6 +17,9 @@ OBJ = $(SRC:.c=.o)
 # Allow C code to call python script
 PYTHON = python3
 
+CFLAGS = $(CFLAGS_BASE)
+LDFLAGS = $(LDFLAGS_BASE)
+
 all: medmate
 
 medmate: $(OBJ)
@@ -30,9 +33,9 @@ src/%.o: src/%.c
 test: medmate
 	./medmate --help
 
-# Build, run the test, then generate gcov reports
-coverage: test
-	# Run gcov against all source files
+coverage: clean
+	$(MAKE) CFLAGS="$(CFLAGS_BASE) --coverage" LDFLAGS="$(LDFLAGS_BASE) --coverage" medmate
+	./medmate --help
 	gcov -o src src/main.c src/core.c src/io.c src/gui.c
 
 clean:
