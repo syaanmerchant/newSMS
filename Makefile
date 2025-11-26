@@ -22,7 +22,7 @@ src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ)  *.gcov src/*.gcno src/*.gcda
+	rm -f $(OBJ)  *.gcov src/*.gcno src/*.gcda data/meds_export.csv data/meds.txt
 
 coverage: clean
 	$(MAKE) CFLAGS="$(CFLAGS) $(COVERAGE_FLAGS)" \

@@ -5,7 +5,7 @@
 #include "gui.h"
 
 static void print_help(const char *progname) {
-    printf("MedMate - Medication Reminder (C Project)\n");
+    printf("MedMate - Medication Reminder App\n");
     printf("Usage:\n");
     printf("  %s            Start the GUI (stub for now)\n", progname);
     printf("  %s --help     Show this help message\n", progname);
