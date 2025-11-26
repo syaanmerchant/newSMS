@@ -22,13 +22,12 @@ src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ) medmate *.gcov src/*.gcno src/*.gcda
+	rm -f $(OBJ)  *.gcov src/*.gcno src/*.gcda
 
 coverage: clean
 	$(MAKE) CFLAGS="$(CFLAGS) $(COVERAGE_FLAGS)" \
 	        LDFLAGS="$(LDFLAGS) $(COVERAGE_FLAGS)" \
-	        medmate
-
+	        
 	./medmate --help || true
 
 	gcov -o src src/main.c src/core.c src/io.c src/gui.c
