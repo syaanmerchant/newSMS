@@ -1,9 +1,10 @@
-#include "gui.h"
-#include <stdio.h>
+#ifndef GUI_H
+#define GUI_H
 
-int run_gui(MedicationList *list) {
-    (void)list;
-    printf("GUI would start here (stub). For now, this is just a placeholder.\n");
-    printf("Later, this will open a real window.\n");
-    return 0;
-}
+#include "core.h"
+
+// Run the GUI, using the given medication list.
+// Returns 0 on normal exit.
+int run_gui(MedicationList *list);
+
+#endif
