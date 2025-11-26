@@ -24,12 +24,10 @@ jobs:
 
       - name: Run tests (placeholder)
         run: |
-          # For now, just run the binary once so we know it launches
-          ./medmate --help || echo "medmate exited with non-zero status"
+          ./medmate --help ||
 
       - name: Generate coverage (gcov)
         run: |
-          # Uses the coverage target from the Makefile
           make coverage
 
       - name: Show generated coverage files
