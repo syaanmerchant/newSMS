@@ -1,21 +1,17 @@
-
 CC = gcc
 COVFLAGS = --coverage
 
-# Compile flags:
-#  -Wall -Wextra : show useful warnings
-#  -Iinclude     : look for headers in include/
-#  pkg-config    : add GTK include flags
+# Normal compile flags
 CFLAGS = -Wall -Wextra -Iinclude `pkg-config --cflags gtk+-3.0`
 
-# Linker flags: use pkg-config to link against GTK libs
+# Normal linker flags
 LDFLAGS = `pkg-config --libs gtk+-3.0`
 
 SRC = src/main.c src/core.c src/io.c src/gui.c
 OBJ = $(SRC:.c=.o)
 
-# Allow C code to call python script
-PYTHON = python3
+# For coverage builds
+COVERAGE_FLAGS = -O0 -g --coverage   # or: -fprofile-arcs -ftest-coverage
 
 CFLAGS = $(CFLAGS_BASE)
 LDFLAGS = $(LDFLAGS_BASE)
@@ -41,4 +37,14 @@ coverage: clean
 clean:
 	rm -f $(OBJ) medmate *.gcov src/*.gcda src/*.gcno
 
+# ===== Coverage target =====
+coverage: clean
+	# Rebuild everything with coverage instrumentation
+	$(MAKE) CFLAGS="$(CFLAGS) $(COVERAGE_FLAGS)" \
+	        LDFLAGS="$(LDFLAGS) $(COVERAGE_FLAGS)" medmate
 
+	# Run the program at least once to generate .gcda
+	./medmate --help
+
+	# Run gcov on all source files
+	gcov -o src src/main.c src/core.c src/io.c src/gui.c

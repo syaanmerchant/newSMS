@@ -18,29 +18,21 @@ jobs:
           sudo apt-get install -y gcc make
           sudo apt-get install -y build-essential libgtk-3-dev pkg-config
 
-
-
       - name: Build with Make
         run: |
           make
 
-      - name: Run tests (if any)
+      - name: Run tests (placeholder)
         run: |
-          # For now, no tests - placeholder
-          echo "No tests yet. Add tests and update this step later."
+          # For now, just run the binary once so we know it launches
+          ./medmate --help || echo "medmate exited with non-zero status"
 
-      - name: Generate coverage
+      - name: Generate coverage (gcov)
         run: |
+          # Uses the coverage target from the Makefile
           make coverage
 
-      - name: Upload coverage artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: gcov-report
-          path: |
-            *.gcov
-            src/*.gcda
-            src/*.gcno
-          
-
-
+      - name: Show generated coverage files
+        run: |
+          ls -R
+          echo "Look for *.gcov, *.gcno, *.gcda in src/"
