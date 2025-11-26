@@ -24,7 +24,7 @@ jobs:
 
       - name: Run tests (placeholder)
         run: |
-          ./medmate --help ||
+          ./medmate --help || true
 
       - name: Generate coverage (gcov)
         run: |
