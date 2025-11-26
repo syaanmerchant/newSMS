@@ -12,6 +12,7 @@ void init_med_list(MedicationList *list) {
     list->next_id = 1;
 }
 
+
 void add_medication(MedicationList *list, Medication m) {
     if (!list) return;
 
@@ -35,3 +36,29 @@ void add_medication(MedicationList *list, Medication m) {
     // stores medication in list
     list->meds[list->count++] = m;
 }
+
+
+void remove_medication(MedicationList *list, int id) {
+    if (!list) return;
+    int idx = -1;
+
+    // locate the index of the medication to be removed in the list
+    for (int i = 0; i < list->count; i++) {
+        if (list->meds[i].id == id) {
+            idx = i;
+            break;
+        }
+    }
+
+    // if the medication if not in the list (index still = -1) then return the list as it is
+    if (idx < 0) return;
+
+    // shift the list over to account for removing the medicine
+    for (int j = idx; j < list->count - 1; j++) {
+        list->meds[j] = list->meds[j + 1];
+    }
+
+    // reduce the count for medications in the list after removing
+    list->count--;
+}
+
