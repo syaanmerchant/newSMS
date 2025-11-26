@@ -1,5 +1,6 @@
 
 CC = gcc
+COVFLAGS = --coverage
 
 # Compile flags:
 #  -Wall -Wextra : show useful warnings
@@ -25,7 +26,16 @@ medmate: $(OBJ)
 src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Simple test run we can use for coverage
+test: medmate
+	./medmate --help
+
+# Build, run the test, then generate gcov reports
+coverage: test
+	# Run gcov against all source files
+	gcov -o src src/main.c src/core.c src/io.c src/gui.c
+
 clean:
-	rm -f $(OBJ)
+	rm -f $(OBJ) medmate *.gcov src/*.gcda src/*.gcno
 
 
