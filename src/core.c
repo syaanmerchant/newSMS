@@ -62,3 +62,81 @@ void remove_medication(MedicationList *list, int id) {
     list->count--;
 }
 
+Medication *find_med_by_id(MedicationList *list, int id) {
+    if (!list) return NULL;
+
+    // goes through every medication in list
+    for (int i = 0; i < list->count; i++) {
+        // checks if medicine at index i has the same id as the one we are searching for
+        if (list->meds[i].id == id) {
+            // if the IDs match, return a pointer to that medication inside the list's array.
+            return &list->meds[i];
+        }
+    }
+
+    // if after going through the list we cant find it, return null
+    return NULL;
+}
+
+
+void get_current_time(TimeOfDay *out) {
+    if (!out) return;
+
+    // gets current time
+    time_t t = time(NULL);
+
+    // converts time t into (hour, minute, second, etc.) based on the user's local timezon
+    struct tm *tm_info = localtime(&t);
+
+
+    out->hour = tm_info->tm_hour;
+    out->minute = tm_info->tm_min;
+}
+
+// Helper: absolute value of int
+static int iabs_int(int x) {
+    return x < 0 ? -x : x;
+}
+
+/*
+static int iabs_int(int x) {
+    if (x < 0) {
+        return -x;
+    }
+    return x;
+}
+*/
+
+
+int get_due_medications(MedicationList *list, TimeOfDay now, Medication *out, int max_out) {
+    if (!list || !out || max_out <= 0) return 0;
+
+    // converts current time into total minutes since midnight
+    int now_total = now.hour * 60 + now.minute;
+
+    // counter for the medications that are due
+    int found = 0;
+
+    // go through every medication in the list
+    for (int i = 0; i < list->count && found < max_out; i++) {
+        Medication *m = &list->meds[i];
+
+        // skip one-time meds that already fired
+        if (m->recurrence == RECURRENCE_ONCE && m->one_time_used) {
+            continue;
+        }
+
+        for (int j = 0; j < m->num_doses; j++) {
+            int dose_total = m->doses[j].hour * 60 + m->doses[j].minute;
+            int diff = dose_total - now_total;
+
+            if (iabs_int(diff) <= 5) { // within +5 or -5 minutes
+                out[found++] = *m;
+                break; // we only need to add it once
+            }
+        }
+    }
+
+    return found;
+}
+
