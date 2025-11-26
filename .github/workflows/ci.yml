@@ -29,7 +29,7 @@ jobs:
           # For now, no tests - placeholder
           echo "No tests yet. Add tests and update this step later."
 
-      - name: Generate coverage (gcov placeholder)
+      - name: Generate coverage
         run: |
           make coverage
 
