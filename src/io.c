@@ -205,7 +205,7 @@ int export_medications_csv(const char *filename, MedicationList *list) {
                               : "daily";
 
         // Combine times into "09:00/21:00"
-        char time_buf[128];
+        char times_buf[128];
         times_buf[0] = '\0';
      
         for (int j = 0; j < m->num_doses; j++) {
@@ -219,11 +219,12 @@ int export_medications_csv(const char *filename, MedicationList *list) {
         }
 
         fprintf(f, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
-                m->name, m->dosage, rec_str, time_buf, m->notes);
+                m->name, m->dosage, rec_str, times_buf, m->notes);
     }
 
     fclose(f);
     return 1;
 }
+
 
 
