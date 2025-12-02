@@ -1,5 +1,8 @@
 CC = gcc
 
+# Coverage flags (for gcov)
+COVERAGE_FLAGS = -O0 -g --coverage
+
 # Compile flags:
 #  -Wall -Wextra : show useful warnings
 #  -Iinclude     : look for headers in include/
@@ -11,7 +14,6 @@ LDFLAGS = `pkg-config --libs gtk+-3.0`
 
 SRC = src/main.c src/core.c src/io.c src/gui.c
 OBJ = $(SRC:.c=.o)
-#TXT = data/meds_export.csv data/meds.txt wiki_tmp.txt
 
 # Allow C code to call python script
 PYTHON = python3
@@ -26,14 +28,13 @@ src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ) medmate  
+	rm -f $(OBJ) medmate
 
 coverage: clean
 	$(MAKE) CFLAGS="$(CFLAGS) $(COVERAGE_FLAGS)" \
 	        LDFLAGS="$(LDFLAGS) $(COVERAGE_FLAGS)" \
 	        medmate
 
-	        
 	./medmate --help || true
 
 	gcov -o src src/main.c src/core.c src/io.c src/gui.c
