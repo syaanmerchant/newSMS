@@ -5,11 +5,11 @@
 #include "gui.h"
 
 static void print_help(const char *progname) {
-    printf("MedMate - Medication Reminder (C Project)\n");
-    printf("Usage:\n");
-    printf("  %s            Start the GUI (stub for now)\n", progname);
+    printf("MedMate - Medication Reminder App\n");
+    printf("Usage: %s [OPTIONS]\n\n", progname);
+    printf("  %s            Start the GUI\n", progname);
     printf("  %s --help     Show this help message\n", progname);
-    printf("  %s --export   Export medications to CSV (stub)\n", progname);
+    printf("  %s --export   Export medications to CSV \n", progname);
 }
 
 int main(int argc, char *argv[]) {
