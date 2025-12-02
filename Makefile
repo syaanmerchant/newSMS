@@ -27,3 +27,13 @@ src/%.o: src/%.c
 
 clean:
 	rm -f $(OBJ) medmate  
+
+coverage: clean
+	$(MAKE) CFLAGS="$(CFLAGS) $(COVERAGE_FLAGS)" \
+	        LDFLAGS="$(LDFLAGS) $(COVERAGE_FLAGS)" \
+	        medmate
+
+	        
+	./medmate --help || true
+
+	gcov -o src src/main.c src/core.c src/io.c src/gui.c
