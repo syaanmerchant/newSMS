@@ -1,0 +1,49 @@
+import sys
+import requests
+import urllib.parse
+
+if len(sys.argv) < 2:
+    print("No medication provided.")
+    sys.exit(0)
+
+raw_query = sys.argv[1].strip()
+if not raw_query:
+    print("No medication provided.")
+    sys.exit(0)
+
+# Try more title variants
+candidates = [
+    raw_query,
+    raw_query.capitalize(),
+    raw_query.title(),
+    raw_query.replace(" ", "/"),
+    "Co-" + raw_query.title(),
+]
+
+def try_summary(title):
+    encoded = urllib.parse.quote(title.replace(" ", "_"))
+    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{encoded}"
+    headers = {'User-Agent': 'WikiLookupScript/1.0 (your-email@example.com)'}
+    try:
+        r = requests.get(url, headers=headers, timeout=5)
+        if r.status_code != 200:
+            return None
+        data = r.json()
+        extract = data.get("extract")
+        if not extract:
+            return None
+        return extract
+    except Exception as e:
+        print(f"Error fetching {title}: {e}")  # For debugging
+        return None
+
+summary = None
+for title in candidates:
+    summary = try_summary(title)
+    if summary:
+        break
+
+if summary:
+    print(summary)
+else:
+    print("No information found.")
