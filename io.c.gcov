@@ -1,0 +1,108 @@
+        -:    0:Source:src/io.c
+        -:    1:// Medication and CSV export
+        -:    2:
+        -:    3:#include "io.h"
+        -:    4:#include <stdio.h>
+        -:    5:#include <string.h>
+        -:    6: 
+        1:    7:int load_medications(const char *filename, MedicationList *list) {
+        1:    8:    FILE *f = fopen(filename, "r");
+        1:    9:    if (!f) {
+        -:   10:        // File might not exist yet, that's OK.
+        1:   11:        init_med_list(list);
+        1:   12:        return 1;
+        -:   13:    }
+    #####:   14:    init_med_list(list);
+        -:   15:
+        -:   16:    int total;
+        -:   17:
+    #####:   18:    if (fscanf(f, "%d\n", &total) != 1) {
+    #####:   19:        fclose(f);
+    #####:   20:        return 0;
+        -:   21:    }
+        -:   22:
+    #####:   23:    for (int i = 0; i < total; i++) {
+        -:   24:        Medication m;
+    #####:   25:        memset(&m, 0, sizeof(Medication));
+        -:   26:
+        -:   27:        // Read name
+    #####:   28:        if (!fgets(m.name, MAX_NAME_LEN, f)) break;
+    #####:   29:        m.name[strcspn(m.name, "\n")] = '\0';
+        -:   30:
+        -:   31:        // Read dosage
+    #####:   32:        if (!fgets(m.dosage, MAX_NAME_LEN, f)) break;
+    #####:   33:        m.dosage[strcspn(m.dosage, "\n")] = '\0';
+        -:   34:
+        -:   35:        // Read number of doses
+    #####:   36:        if (fscanf(f, "%d\n", &m.num_doses) != 1) break;
+        -:   37:
+        -:   38:        // Read times
+    #####:   39:        for (int j = 0; j < m.num_doses; j++) {
+    #####:   40:            fscanf(f, "%d %d\n", &m.doses[j].hour, &m.doses[j].minute);
+        -:   41:        }
+        -:   42:
+        -:   43:        // Read notes (single line)
+    #####:   44:        if (!fgets(m.notes, MAX_NOTES_LEN, f)) break;
+    #####:   45:        m.notes[strcspn(m.notes, "\n")] = '\0';
+        -:   46:
+    #####:   47:        add_medication(list, m);
+        -:   48:    }
+        -:   49:
+    #####:   50:    fclose(f);
+    #####:   51:    return 1;
+        -:   52:}
+        -:   53: 
+    #####:   54:int save_medications(const char *filename, MedicationList *list) {
+    #####:   55:    FILE *f = fopen(filename, "w");
+    #####:   56:    if (!f) return 0;
+        -:   57:    
+    #####:   58:    fprintf(f, "%d\n", list->count);
+        -:   59:
+    #####:   60:    for (int i = 0; i < list->count; i++) {
+    #####:   61:        Medication *m = &list->meds[i];
+        -:   62:
+    #####:   63:        fprintf(f, "%s\n", m->name);
+    #####:   64:        fprintf(f, "%s\n", m->dosage);
+    #####:   65:        fprintf(f, "%d\n", m->num_doses);
+        -:   66:
+    #####:   67:        for (int j = 0; j < m->num_doses; j++) {
+    #####:   68:            fprintf(f, "%02d %02d\n", m->doses[j].hour, m->doses[j].minute);
+        -:   69:        }
+        -:   70:
+    #####:   71:        fprintf(f, "%s\n", m->notes);
+        -:   72:    }
+        -:   73:
+    #####:   74:    fclose(f);
+    #####:   75:    return 1;
+        -:   76:}
+        -:   77: 
+    #####:   78:int export_medications_csv(const char *filename, MedicationList *list) {
+    #####:   79:    FILE *f = fopen(filename, "w");
+    #####:   80:    if (!f) return 0;
+        -:   81:
+    #####:   82:    fprintf(f, "Name,Dosage,DoseTimes,Notes\n");
+        -:   83:
+    #####:   84:    for (int i = 0; i < list->count; i++) {
+    #####:   85:        Medication *m = &list->meds[i];
+        -:   86:
+        -:   87:        // Combine times into "09:00/21:00"
+    #####:   88:        char time_buf[128] = "";
+        -:   89:
+    #####:   90:        for (int j = 0; j < m->num_doses; j++) {
+        -:   91:            char t[16];
+    #####:   92:            snprintf(t, sizeof(t), "%02d:%02d",
+        -:   93:                     m->doses[j].hour, m->doses[j].minute);
+        -:   94:
+    #####:   95:            strcat(time_buf, t);
+    #####:   96:            if (j < m->num_doses - 1) {
+    #####:   97:                strcat(time_buf, "/");
+        -:   98:            }
+        -:   99:        }
+        -:  100:
+    #####:  101:        fprintf(f, "\"%s\",\"%s\",\"%s\",\"%s\"\n",
+    #####:  102:                m->name, m->dosage, time_buf, m->notes);
+        -:  103:    }
+        -:  104:
+    #####:  105:    fclose(f);
+    #####:  106:    return 1;
+        -:  107:}
