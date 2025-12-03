@@ -11,7 +11,7 @@
  *
  * author: syaan merchant
  * date: 2025/12/03
- * version: v1.1.1
+ * version: v2.0.0
  */
 #include "gui.h"
 #include "io.h"
