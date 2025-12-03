@@ -5,8 +5,8 @@
  * Manages MedicationList structure updates, handles time comparisons, 
  * and ensures recurrence (how often a medication is to be taken)settings are validated properly
  *
- * GROUP NUMBER: Team 27
- * DATE: December 3, 2025
+ * AUTHOR: Mahnoor Naveed
+ * DATE: December 2nd, 2025
  * VERSION: v2.0.0
  */
 
