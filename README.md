@@ -94,6 +94,7 @@ MedMate is a C + GTK desktop application that helps users manage their medicatio
   - Works for multi-word queries (e.g., “amoxicillin 500 mg”, “quetiapine medication”).
 
 > Note: Wikipedia lookup requires an internet connection and Python 3 with the `requests` library installed.
+
 > Note on Code Coverage: The gcov results show low line coverage for core.c, io.c, and especially gui.c. This is expected because much of the code, particularly GUI event-handling in gui.c, requires interactive user input to execute. All aspects of the code were thoroughly tested to ensure they work together.
 
 ---
