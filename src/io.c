@@ -4,7 +4,7 @@
  *
  * AUTHOR: Shifa Zaman
  * DATE: December 2nd, 2025
- * VERSION: 1.1.1
+ * VERSION: v2.0.0
  */
 
 #include "io.h"
@@ -225,6 +225,7 @@ int export_medications_csv(const char *filename, MedicationList *list) {
     fclose(f);
     return 1;
 }
+
 
 
 
