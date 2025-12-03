@@ -1,18 +1,44 @@
+/* file input/output helpers for medmate.
+ * handles loading, saving, and exporting the medication list.
+ *
+ * author: Shifa Zaman
+ * date: 2025/12/03
+ * version: v1.1.1
+ */
 #ifndef IO_H
 #define IO_H
 
 #include "core.h"
 
-// Load medications from a file into the list.
-// Returns 1 on success, 0 on failure.
+/* loads medications from the given file into the list.
+ *
+ * params:
+ *   filename - path to the data file
+ *   list     - pointer to the medication list to fill
+ *
+ * on success, overwrites the current list contents.
+ * returns 1 on success and 0 on failure (e.g., file not found or parse error).
+ */
 int load_medications(const char *filename, MedicationList *list);
 
-// Save medications from the list into a file.
-// Returns 1 on success, 0 on failure.
+/* saves all medications from list into the given file.
+ *
+ * params:
+ *   filename - path to the data file
+ *   list     - pointer to the medication list to save
+ *
+ * returns 1 on success and 0 on failure (e.g., file could not be opened).
+ */
 int save_medications(const char *filename, MedicationList *list);
 
-// Export medications as CSV
-// Returns 1 on success, 0 on failure.
+/* exports the medications as csv so they can be opened in a spreadsheet.
+ *
+ * params:
+ *   filename - path to the csv file to write
+ *   list     - pointer to the medication list to export
+ *
+ * returns 1 on success and 0 on failure.
+ */
 int export_medications_csv(const char *filename, MedicationList *list);
 
 #endif
