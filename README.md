@@ -2,6 +2,22 @@
 
 MedMate is a C + GTK desktop application that helps users manage their medications, daily schedules, and reminders. It supports recurring and one-time medications, local data storage, CSV export, and both offline and online (Wikipedia) medication lookup.
 
+### Execution Order
+```bash
+# Clean Old Binaries Artifacts and Build 
+make clean
+make
+
+# Run the application
+./medmate
+
+# Run Coverage then Clean
+make coverage
+make clean
+
+
+```
+
 ---
 
 ## Features
