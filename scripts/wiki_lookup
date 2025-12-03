@@ -1,7 +1,23 @@
+#!/usr/bin/env python3
+
+"""
+simple wikipedia lookup helper for medmate.
+
+this script:
+- takes a medication name from the command line
+- tries a few different title variants
+- calls the wikipedia rest api summary endpoint
+- prints a short summary or a fallback message
+
+author: syaan merchant
+date: 2025/12/03
+version: v1.1.1
+"""
 import sys
 import requests
 import urllib.parse
 
+# make sure we actually got a query string from the command line
 if len(sys.argv) < 2:
     print("No medication provided.")
     sys.exit(0)
@@ -11,7 +27,7 @@ if not raw_query:
     print("No medication provided.")
     sys.exit(0)
 
-# Try more title variants
+# try multiple possible title variants to increase the chance of a hit
 candidates = [
     raw_query,
     raw_query.capitalize(),
@@ -20,7 +36,11 @@ candidates = [
     "Co-" + raw_query.title(),
 ]
 
+# function to try fetching a summary for a given title
+# returns the summary string or None
 def try_summary(title):
+
+     # wikipedia uses underscores instead of spaces in the path
     encoded = urllib.parse.quote(title.replace(" ", "_"))
     url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{encoded}"
     headers = {'User-Agent': 'WikiLookupScript/1.0 (your-email@example.com)'}
@@ -33,16 +53,21 @@ def try_summary(title):
         if not extract:
             return None
         return extract
+           
+     # send debug info to stderr so it does not show up in the gui text
     except Exception as e:
         print(f"Error fetching {title}: {e}")  # For debugging
         return None
 
 summary = None
+
+# try each candidate title until one returns a summary
 for title in candidates:
     summary = try_summary(title)
     if summary:
         break
 
+# if we found something, print it; otherwise print a fallback message
 if summary:
     print(summary)
 else:

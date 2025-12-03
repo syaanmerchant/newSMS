@@ -1,3 +1,18 @@
+
+/* gtk-based graphical user interface for the medmate application.
+ * this file connects the medicationlist core logic to the ui.
+ * it handles:
+ * - listing medications
+ * - adding, editing, and deleting medications
+ * - exporting data
+ * - showing today's schedule
+ * - simple reminder popups
+ * - wikipedia lookup for a medication name (via a helper script)
+ *
+ * author: syaan merchant
+ * date: 2025/12/03
+ * version: v1.1.1
+ */
 #include "gui.h"
 #include "io.h"
 #include <gtk/gtk.h>
@@ -8,7 +23,7 @@ static MedicationList *g_med_list = NULL;
 static GtkWidget *g_list_box = NULL;
 static GtkWidget *g_main_window = NULL;
 
-// Forward declarations
+/* forward declarations for internal helpers */
 static void refresh_med_list(void);
 static void on_add_med_clicked(GtkButton *button, gpointer user_data);
 static void on_export_clicked(GtkButton *button, gpointer user_data);
@@ -20,8 +35,9 @@ static GtkWidget* create_med_row(Medication *m);
 static void show_todays_schedule(void);
 static void on_wiki_lookup_clicked(GtkButton *button, gpointer user_data);
 
-// ---------- Helpers ----------
+/* ---------- helpers ---------- */
 
+/* single row widget for one medication entry. */
 static GtkWidget* create_med_row(Medication *m) {
     GtkWidget *row = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
 
@@ -50,6 +66,7 @@ static GtkWidget* create_med_row(Medication *m) {
     return row;
 }
 
+/* clears and repopulates the medication list ui. */
 static void refresh_med_list(void) {
     if (!g_list_box || !g_med_list) return;
 
@@ -67,11 +84,14 @@ static void refresh_med_list(void) {
     gtk_widget_show_all(g_list_box);
 }
 
+/* opens a dialog asking for a medication name, then runs a python helper
+ * script that looks it up on wikipedia. the result is shown in a message dialog.
+ */
 static void on_wiki_lookup_clicked(GtkButton *button, gpointer user_data) {
     (void)button;
     (void)user_data;
 
-    // Ask for medication name
+    //  medication name
     GtkWidget *dialog = gtk_dialog_new_with_buttons(
         "Wikipedia Lookup",
         GTK_WINDOW(g_main_window),
@@ -101,10 +121,10 @@ static void on_wiki_lookup_clicked(GtkButton *button, gpointer user_data) {
                      "python3 scripts/wiki_lookup \"%s\" > wiki_tmp.txt",
                      name);
 
-            // Execute Python script
+            /* run the python helper script */
             system(command);
 
-            // Read result
+            // read result of the lookup helper script
             FILE *f = fopen("wiki_tmp.txt", "r");
             if (f) {
                 char buffer[2048];
@@ -130,8 +150,10 @@ static void on_wiki_lookup_clicked(GtkButton *button, gpointer user_data) {
 }
 
 
-// ---------- Reminder timer ----------
+/* ---------- reminder timer ---------- */
 
+/* timer callback that checks if any medications are due and shows a popup.
+ * runs periodically (once per minute). */
 static gboolean reminder_check_callback(gpointer user_data) {
     (void)user_data;
 
@@ -172,8 +194,10 @@ static gboolean reminder_check_callback(gpointer user_data) {
     return TRUE;
 }
 
-// ---------- Add Medication dialog ----------
+/* ---------- add medication dialog ---------- */
 
+/* opens a dialog that lets the user create a new medication and add it
+ * to the shared list. */
 static void on_add_med_clicked(GtkButton *button, gpointer user_data) {
     (void)button;
     (void)user_data;
@@ -192,19 +216,19 @@ static void on_add_med_clicked(GtkButton *button, gpointer user_data) {
     gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
     gtk_container_add(GTK_CONTAINER(content), grid);
 
-    // Name
+    /* name */
     GtkWidget *lbl_name = gtk_label_new("Name:");
     GtkWidget *entry_name = gtk_entry_new();
     gtk_grid_attach(GTK_GRID(grid), lbl_name, 0, 0, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), entry_name, 1, 0, 1, 1);
 
-    // Dosage
+    /* dosage */
     GtkWidget *lbl_dosage = gtk_label_new("Dosage:");
     GtkWidget *entry_dosage = gtk_entry_new();
     gtk_grid_attach(GTK_GRID(grid), lbl_dosage, 0, 1, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), entry_dosage, 1, 1, 1, 1);
 
-    // Recurrence (Daily / One-time)
+    /* recurrence (daily / one-time) */
     GtkWidget *lbl_rec = gtk_label_new("Recurrence:");
     GtkWidget *rec_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     GtkWidget *rb_daily = gtk_radio_button_new_with_label(NULL, "Daily");
@@ -217,14 +241,14 @@ static void on_add_med_clicked(GtkButton *button, gpointer user_data) {
     gtk_grid_attach(GTK_GRID(grid), lbl_rec, 0, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), rec_box, 1, 2, 1, 1);
 
-    // Doses per day
+    /* doses per day */
     GtkWidget *lbl_doses = gtk_label_new("Doses per day (1–4):");
     GtkAdjustment *adj = gtk_adjustment_new(1, 1, 4, 1, 1, 0);
     GtkWidget *spin_doses = gtk_spin_button_new(adj, 1, 0);
     gtk_grid_attach(GTK_GRID(grid), lbl_doses, 0, 3, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), spin_doses, 1, 3, 1, 1);
 
-    // Time entries
+    /* time entries */
     GtkWidget *lbl_time1 = gtk_label_new("Time 1 (HH:MM):");
     GtkWidget *entry_time1 = gtk_entry_new();
     gtk_entry_set_placeholder_text(GTK_ENTRY(entry_time1), "09:00");
@@ -250,7 +274,7 @@ static void on_add_med_clicked(GtkButton *button, gpointer user_data) {
     gtk_grid_attach(GTK_GRID(grid), lbl_time4, 0, 7, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), entry_time4, 1, 7, 1, 1);
 
-    // Notes
+    /* notes */
     GtkWidget *lbl_notes = gtk_label_new("Notes:");
     GtkWidget *entry_notes = gtk_entry_new();
     gtk_grid_attach(GTK_GRID(grid), lbl_notes, 0, 8, 1, 1);
@@ -269,6 +293,7 @@ static void on_add_med_clicked(GtkButton *button, gpointer user_data) {
             ? RECURRENCE_ONCE
             : RECURRENCE_DAILY;
 
+        /* basic validation for name and dosage */
         if (!name || strlen(name) == 0 || !dosage || strlen(dosage) == 0) {
             GtkWidget *msg = gtk_message_dialog_new(
                 GTK_WINDOW(g_main_window),
@@ -324,8 +349,9 @@ static void on_add_med_clicked(GtkButton *button, gpointer user_data) {
     gtk_widget_destroy(dialog);
 }
 
-// ---------- Edit / Delete ----------
+/* ---------- edit / delete ---------- */
 
+/* opens a dialog to edit an existing medication. */
 static void on_edit_med_clicked(GtkButton *button, gpointer user_data) {
     (void)user_data;
 
@@ -347,21 +373,21 @@ static void on_edit_med_clicked(GtkButton *button, gpointer user_data) {
     gtk_grid_set_column_spacing(GTK_GRID(grid), 5);
     gtk_container_add(GTK_CONTAINER(content), grid);
 
-    // Name
+    /* name */
     GtkWidget *lbl_name = gtk_label_new("Name:");
     GtkWidget *entry_name = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(entry_name), m->name);
     gtk_grid_attach(GTK_GRID(grid), lbl_name, 0, 0, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), entry_name, 1, 0, 1, 1);
 
-    // Dosage
+    /* dosage */
     GtkWidget *lbl_dosage = gtk_label_new("Dosage:");
     GtkWidget *entry_dosage = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(entry_dosage), m->dosage);
     gtk_grid_attach(GTK_GRID(grid), lbl_dosage, 0, 1, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), entry_dosage, 1, 1, 1, 1);
 
-    // Recurrence
+    /* recurrence */
     GtkWidget *lbl_rec = gtk_label_new("Recurrence:");
     GtkWidget *rec_box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
     GtkWidget *rb_daily = gtk_radio_button_new_with_label(NULL, "Daily");
@@ -380,14 +406,14 @@ static void on_edit_med_clicked(GtkButton *button, gpointer user_data) {
     gtk_grid_attach(GTK_GRID(grid), lbl_rec, 0, 2, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), rec_box, 1, 2, 1, 1);
 
-    // Doses per day
+    /* doses per day */
     GtkWidget *lbl_doses = gtk_label_new("Doses per day (1–4):");
     GtkAdjustment *adj = gtk_adjustment_new(m->num_doses, 1, 4, 1, 1, 0);
     GtkWidget *spin_doses = gtk_spin_button_new(adj, 1, 0);
     gtk_grid_attach(GTK_GRID(grid), lbl_doses, 0, 3, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), spin_doses, 1, 3, 1, 1);
 
-    // Times
+    /* times */
     GtkWidget *lbl_time1 = gtk_label_new("Time 1 (HH:MM):");
     GtkWidget *entry_time1 = gtk_entry_new();
     GtkWidget *lbl_time2 = gtk_label_new("Time 2 (HH:MM):");
@@ -424,7 +450,7 @@ static void on_edit_med_clicked(GtkButton *button, gpointer user_data) {
     gtk_grid_attach(GTK_GRID(grid), lbl_time4, 0, 7, 1, 1);
     gtk_grid_attach(GTK_GRID(grid), entry_time4, 1, 7, 1, 1);
 
-    // Notes
+    /* notes */
     GtkWidget *lbl_notes = gtk_label_new("Notes:");
     GtkWidget *entry_notes = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(entry_notes), m->notes);
@@ -444,6 +470,7 @@ static void on_edit_med_clicked(GtkButton *button, gpointer user_data) {
             ? RECURRENCE_ONCE
             : RECURRENCE_DAILY;
 
+        /* basic validation again in case user clears fields */
         if (!name || strlen(name) == 0 || !dosage || strlen(dosage) == 0) {
             GtkWidget *msg = gtk_message_dialog_new(
                 GTK_WINDOW(g_main_window),
@@ -463,6 +490,7 @@ static void on_edit_med_clicked(GtkButton *button, gpointer user_data) {
         m->num_doses = num_doses;
         m->recurrence = rec;
 
+        /* if it becomes a one-time med again, reset the used flag */
         if (m->recurrence == RECURRENCE_ONCE && m->one_time_used != 0) {
             m->one_time_used = 0;
         }
@@ -498,7 +526,7 @@ static void on_edit_med_clicked(GtkButton *button, gpointer user_data) {
 
     gtk_widget_destroy(dialog);
 }
-
+/* confirms and deletes a medication selected from the list. */
 static void on_delete_med_clicked(GtkButton *button, gpointer user_data) {
     (void)user_data;
 
@@ -523,8 +551,9 @@ static void on_delete_med_clicked(GtkButton *button, gpointer user_data) {
     }
 }
 
-// ---------- Export ----------
+/* ---------- export ---------- */
 
+/* exports the current medication list as a csv file. */
 static void on_export_clicked(GtkButton *button, gpointer user_data) {
     (void)button;
     (void)user_data;
@@ -550,7 +579,7 @@ static void on_export_clicked(GtkButton *button, gpointer user_data) {
     }
 }
 
-// ---------- Today's Schedule ----------
+/* ---------- today's schedule ---------- */
 
 typedef struct {
     Medication *med;
@@ -558,6 +587,7 @@ typedef struct {
     int minutes_diff;
 } ScheduleEntry;
 
+/* shows a dialog with today's medication schedule. */
 static void show_todays_schedule(void) {
     if (!g_med_list || g_med_list->count == 0) {
         GtkWidget *msg = gtk_message_dialog_new(
@@ -581,10 +611,12 @@ static void show_todays_schedule(void) {
     for (int i = 0; i < g_med_list->count; i++) {
         Medication *m = &g_med_list->meds[i];
 
+        /* skip one-time meds that have already been used */
         if (m->recurrence == RECURRENCE_ONCE && m->one_time_used) {
             continue;
         }
 
+        /* add doses to the schedule */
         for (int j = 0; j < m->num_doses; j++) {
             if (entry_count >= MAX_MEDICATIONS * MAX_DOSES_PER_MED) break;
 
@@ -611,6 +643,7 @@ static void show_todays_schedule(void) {
         return;
     }
 
+    /* simple sort by time of day (ascending) */
     for (int i = 0; i < entry_count - 1; i++) {
         for (int j = i + 1; j < entry_count; j++) {
             int ti = entries[i].time.hour * 60 + entries[i].time.minute;
@@ -690,8 +723,9 @@ static void on_schedule_clicked(GtkButton *button, gpointer user_data) {
     show_todays_schedule();
 }
 
-// ---------- Main GUI entry ----------
+/* ---------- main gui entry ---------- */
 
+/* sets up the main window and starts the gtk main loop. */
 int run_gui(MedicationList *list) {
     g_med_list = list;
 
@@ -735,6 +769,7 @@ int run_gui(MedicationList *list) {
 
     refresh_med_list();
 
+     /* check for reminders once every 60 seconds */
     g_timeout_add_seconds(60, reminder_check_callback, NULL);
 
     gtk_widget_show_all(g_main_window);
