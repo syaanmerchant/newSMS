@@ -7,7 +7,7 @@
  *
  * GROUP NUMBER: Team 27
  * DATE: December 3, 2025
- * VERSION: v1.1.0
+ * VERSION: v2.0.0
  */
 
 #include "core.h"
